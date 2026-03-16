@@ -1,11 +1,11 @@
-const express      = require('express');
-const cors         = require('cors');
-const helmet       = require('helmet');
-const morgan       = require('morgan');
-const rateLimit    = require('express-rate-limit');
+const express = require('express');
+const cors = require('cors');
+const helmet = require('helmet');
+const morgan = require('morgan');
+const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
-const connectDB    = require('./config/db');
+const connectDB = require('./config/db');
 
 // Connect to MongoDB
 connectDB();
@@ -17,7 +17,12 @@ const app = express();
 ══════════════════════════════════════ */
 app.use(helmet());
 app.use(cors({
-  origin:      ['http://localhost:3000', 'http://localhost:5173', 'http://127.0.0.1:5173'],
+  origin: [
+    'http://localhost:3000',
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+    process.env.FRONTEND_URL, // add your deployed frontend URL in Render env vars
+  ].filter(Boolean),
   credentials: true,
 }));
 app.use(express.json({ limit: '10kb' }));
@@ -48,8 +53,13 @@ if (process.env.NODE_ENV !== 'production') {
 /* ══════════════════════════════════════
    ROUTES
 ══════════════════════════════════════ */
-app.use('/api/auth',  require('./routes/auth'));
+app.use('/api/auth', require('./routes/auth'));
 app.use('/api/vault', require('./routes/vault'));
+
+/* ── Root ── */
+app.get('/', (req, res) => {
+  res.json({ status: 'ok', message: 'Lockify API is live 🔒' });
+});
 
 /* ── Health Check ── */
 app.get('/api/health', (req, res) => {
