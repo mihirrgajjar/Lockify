@@ -53,12 +53,7 @@ app.use('/api/vault', require('./routes/vault'));
 
 /* ── Health Check ── */
 app.get('/api/health', (req, res) => {
-  res.json({
-    status:  'ok',
-    service: 'Lockify API',
-    version: '1.0.0',
-    time:    new Date().toISOString(),
-  });
+  res.json({ status: 'ok' });
 });
 
 /* ── 404 handler ── */
