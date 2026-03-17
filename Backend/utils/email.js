@@ -1,35 +1,9 @@
 require('dotenv').config();
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
-// Debug: Log email configuration (hiding password)
-console.log('Email Config:', {
-  host: process.env.EMAIL_HOST,
-  port: process.env.EMAIL_PORT,
-  user: process.env.EMAIL_USER,
-  from: process.env.EMAIL_FROM,
-  hasPassword: !!process.env.EMAIL_PASS,
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-const transporter = nodemailer.createTransport({
-  host:   process.env.EMAIL_HOST,
-  port:   parseInt(process.env.EMAIL_PORT),
-  secure: parseInt(process.env.EMAIL_PORT) === 465,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-  tls: {
-    rejectUnauthorized: false,
-  },
-});
-
-// Verify transporter configuration on startup
-transporter.verify(function (error, success) {
-  if (error) {
-    console.error('Email transporter verification failed:', error.message);
-    console.error('Full error:', error);
-  }
-});
+const FROM_EMAIL = 'Lockify <onboarding@resend.dev>';
 
 /**
  * Send OTP email
@@ -37,25 +11,25 @@ transporter.verify(function (error, success) {
 async function sendOtpEmail(toEmail, otp, type = 'verify') {
   const subjects = {
     verify: 'Verify your Lockify account',
-    login:  'Your Lockify login code',
-    reset:  'Reset your Lockify password',
+    login: 'Your Lockify login code',
+    reset: 'Reset your Lockify password',
   };
 
   const labels = {
     verify: 'confirm your account',
-    login:  'sign in to your account',
-    reset:  'reset your password',
+    login: 'sign in to your account',
+    reset: 'reset your password',
   };
 
   try {
-    const info = await transporter.sendMail({
-      from:    process.env.EMAIL_FROM,
-      to:      toEmail,
+    const { data, error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: [toEmail],
       subject: subjects[type] || subjects.verify,
       html: `
         <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px;background:#0f1224;border-radius:16px;color:#e2e8f0;">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:24px;">
-            <span style="font-size:1.2rem;font-weight:700;color:#e8edff;">Lockify</span>
+          <div style="margin-bottom:24px;">
+            <span style="font-size:1.2rem;font-weight:700;color:#e8edff;">🔒 Lockify</span>
           </div>
           <h2 style="color:#ffffff;margin-bottom:8px;">Your verification code</h2>
           <p style="color:#8892b0;margin-bottom:24px;">Use this code to ${labels[type] || labels.verify}:</p>
@@ -68,11 +42,16 @@ async function sendOtpEmail(toEmail, otp, type = 'verify') {
         </div>
       `,
     });
-    
-    return info;
+
+    if (error) {
+      console.error('❌ Failed to send email:', error);
+      throw new Error(error.message);
+    }
+
+    console.log('✅ Email sent successfully:', data);
+    return data;
   } catch (error) {
     console.error('❌ Failed to send email:', error.message);
-    console.error('❌ Full error:', error);
     throw error;
   }
 }
@@ -115,14 +94,14 @@ async function sendSecurityAlertEmail(toEmail, userName, alertType, details = {}
   const alert = alerts[alertType] || alerts.new_login;
 
   try {
-    const info = await transporter.sendMail({
-      from: process.env.EMAIL_FROM,
-      to: toEmail,
+    const { data, error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: [toEmail],
       subject: alert.subject,
       html: `
         <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px;background:#0f1224;border-radius:16px;color:#e2e8f0;">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:24px;">
-            <span style="font-size:1.2rem;font-weight:700;color:#e8edff;">Lockify</span>
+          <div style="margin-bottom:24px;">
+            <span style="font-size:1.2rem;font-weight:700;color:#e8edff;">🔒 Lockify</span>
           </div>
           <div style="text-align:center;margin-bottom:24px;">
             <div style="font-size:3rem;margin-bottom:8px;">${alert.icon}</div>
@@ -143,7 +122,9 @@ async function sendSecurityAlertEmail(toEmail, userName, alertType, details = {}
         </div>
       `,
     });
-    return info;
+
+    if (error) throw new Error(error.message);
+    return data;
   } catch (error) {
     console.error('Failed to send security alert email:', error.message);
     throw error;
@@ -155,21 +136,21 @@ async function sendSecurityAlertEmail(toEmail, userName, alertType, details = {}
  */
 async function sendWeakPasswordAlertEmail(toEmail, userName, weakPasswords = []) {
   try {
-    const passwordList = weakPasswords.map(pwd => 
+    const passwordList = weakPasswords.map(pwd =>
       `<div style="background:#1a1f3a;border-radius:6px;padding:12px;margin-bottom:8px;">
         <div style="color:#e2e8f0;font-weight:600;margin-bottom:4px;">${pwd.name || 'Unknown'}</div>
         <div style="color:#f87171;font-size:0.85rem;">Strength: ${pwd.strength || 'Weak'}</div>
       </div>`
     ).join('');
 
-    const info = await transporter.sendMail({
-      from: process.env.EMAIL_FROM,
-      to: toEmail,
+    const { data, error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: [toEmail],
       subject: 'Weak Passwords Detected - Lockify Security Alert',
       html: `
         <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px;background:#0f1224;border-radius:16px;color:#e2e8f0;">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:24px;">
-            <span style="font-size:1.2rem;font-weight:700;color:#e8edff;">Lockify</span>
+          <div style="margin-bottom:24px;">
+            <span style="font-size:1.2rem;font-weight:700;color:#e8edff;">🔒 Lockify</span>
           </div>
           <div style="text-align:center;margin-bottom:24px;">
             <div style="font-size:3rem;margin-bottom:8px;">🔓</div>
@@ -180,17 +161,14 @@ async function sendWeakPasswordAlertEmail(toEmail, userName, weakPasswords = [])
             <h3 style="color:#f87171;margin-bottom:16px;font-size:0.9rem;">Weak Passwords:</h3>
             ${passwordList}
           </div>
-          <div style="background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.3);border-radius:8px;padding:16px;margin-bottom:24px;">
-            <p style="color:#fbbf24;font-size:0.85rem;margin:0;">
-              <strong>Recommendation:</strong> Please update these passwords to stronger ones to protect your accounts.
-            </p>
-          </div>
           <hr style="border:none;border-top:1px solid #1a1f3a;margin:24px 0;" />
           <p style="color:#4a5270;font-size:0.75rem;">Log in to your Lockify account to update these passwords.</p>
         </div>
       `,
     });
-    return info;
+
+    if (error) throw new Error(error.message);
+    return data;
   } catch (error) {
     console.error('Failed to send weak password alert email:', error.message);
     throw error;
@@ -202,21 +180,21 @@ async function sendWeakPasswordAlertEmail(toEmail, userName, weakPasswords = [])
  */
 async function sendPasswordExpiryEmail(toEmail, userName, expiredPasswords = []) {
   try {
-    const passwordList = expiredPasswords.map(pwd => 
+    const passwordList = expiredPasswords.map(pwd =>
       `<div style="background:#1a1f3a;border-radius:6px;padding:12px;margin-bottom:8px;">
         <div style="color:#e2e8f0;font-weight:600;margin-bottom:4px;">${pwd.name || 'Unknown'}</div>
         <div style="color:#fbbf24;font-size:0.85rem;">Age: ${pwd.age || '90+ days'}</div>
       </div>`
     ).join('');
 
-    const info = await transporter.sendMail({
-      from: process.env.EMAIL_FROM,
-      to: toEmail,
+    const { data, error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: [toEmail],
       subject: 'Password Update Reminder - Lockify',
       html: `
         <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px;background:#0f1224;border-radius:16px;color:#e2e8f0;">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:24px;">
-            <span style="font-size:1.2rem;font-weight:700;color:#e8edff;">Lockify</span>
+          <div style="margin-bottom:24px;">
+            <span style="font-size:1.2rem;font-weight:700;color:#e8edff;">🔒 Lockify</span>
           </div>
           <div style="text-align:center;margin-bottom:24px;">
             <div style="font-size:3rem;margin-bottom:8px;">⏰</div>
@@ -227,17 +205,14 @@ async function sendPasswordExpiryEmail(toEmail, userName, expiredPasswords = [])
             <h3 style="color:#fbbf24;margin-bottom:16px;font-size:0.9rem;">Passwords to Update:</h3>
             ${passwordList}
           </div>
-          <div style="background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.3);border-radius:8px;padding:16px;margin-bottom:24px;">
-            <p style="color:#34d399;font-size:0.85rem;margin:0;">
-              <strong>Security Best Practice:</strong> Regular password updates help protect your accounts from unauthorized access.
-            </p>
-          </div>
           <hr style="border:none;border-top:1px solid #1a1f3a;margin:24px 0;" />
           <p style="color:#4a5270;font-size:0.75rem;">Log in to your Lockify account to update these passwords.</p>
         </div>
       `,
     });
-    return info;
+
+    if (error) throw new Error(error.message);
+    return data;
   } catch (error) {
     console.error('Failed to send password expiry email:', error.message);
     throw error;
@@ -249,20 +224,20 @@ async function sendPasswordExpiryEmail(toEmail, userName, expiredPasswords = [])
  */
 async function sendAccountDeletedEmail(toEmail, userName) {
   try {
-    const info = await transporter.sendMail({
-      from:    process.env.EMAIL_FROM,
-      to:      toEmail,
+    const { data, error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: [toEmail],
       subject: 'Account Deleted - Lockify',
       html: `
         <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px;background:#0f1224;border-radius:16px;color:#e2e8f0;">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:24px;">
-            <span style="font-size:1.2rem;font-weight:700;color:#e8edff;">Lockify</span>
+          <div style="margin-bottom:24px;">
+            <span style="font-size:1.2rem;font-weight:700;color:#e8edff;">🔒 Lockify</span>
           </div>
           <h2 style="color:#ffffff;margin-bottom:8px;">Account Deleted</h2>
           <p style="color:#8892b0;margin-bottom:24px;">Hi ${userName},</p>
           <p style="color:#8892b0;margin-bottom:24px;">Your Lockify account and all associated data have been permanently deleted as requested.</p>
           <div style="background:#1a1f3a;border:1px solid #2a3050;border-radius:12px;padding:24px;text-align:center;margin-bottom:24px;">
-            <span style="font-size:1.5rem;font-weight:700;color:#f87171;font-family:sans-serif;">Account Permanently Closed</span>
+            <span style="font-size:1.5rem;font-weight:700;color:#f87171;">Account Permanently Closed</span>
           </div>
           <p style="color:#4a5270;font-size:0.85rem;">This action cannot be undone. All your saved passwords and personal data have been wiped from our systems.</p>
           <hr style="border:none;border-top:1px solid #1a1f3a;margin:24px 0;" />
@@ -270,18 +245,20 @@ async function sendAccountDeletedEmail(toEmail, userName) {
         </div>
       `,
     });
-    console.log(`✅ Deletion email sent to ${toEmail}: ${info.messageId}`);
-    return info;
+
+    if (error) throw new Error(error.message);
+    console.log(`✅ Deletion email sent to ${toEmail}`);
+    return data;
   } catch (error) {
     console.error('❌ Failed to send account deletion email:', error.message);
     throw error;
   }
 }
 
-module.exports = { 
-  sendOtpEmail, 
-  sendSecurityAlertEmail, 
-  sendWeakPasswordAlertEmail, 
+module.exports = {
+  sendOtpEmail,
+  sendSecurityAlertEmail,
+  sendWeakPasswordAlertEmail,
   sendPasswordExpiryEmail,
   sendAccountDeletedEmail
 };
