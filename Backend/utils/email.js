@@ -1,9 +1,17 @@
 require('dotenv').config();
-const { Resend } = require('resend');
+const nodemailer = require('nodemailer');
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+  host: 'smtp-relay.brevo.com',
+  port: 587,
+  secure: false,
+  auth: {
+    user: process.env.BREVO_USER,
+    pass: process.env.BREVO_SMTP_KEY,
+  },
+});
 
-const FROM_EMAIL = 'Lockify <onboarding@resend.dev>';
+const FROM_EMAIL = 'Lockify <noreply@lockify.app>';
 
 /**
  * Send OTP email
@@ -22,9 +30,9 @@ async function sendOtpEmail(toEmail, otp, type = 'verify') {
   };
 
   try {
-    const { data, error } = await resend.emails.send({
+    const info = await transporter.sendMail({
       from: FROM_EMAIL,
-      to: [toEmail],
+      to: toEmail,
       subject: subjects[type] || subjects.verify,
       html: `
         <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px;background:#0f1224;border-radius:16px;color:#e2e8f0;">
@@ -42,14 +50,8 @@ async function sendOtpEmail(toEmail, otp, type = 'verify') {
         </div>
       `,
     });
-
-    if (error) {
-      console.error('❌ Failed to send email:', error);
-      throw new Error(error.message);
-    }
-
-    console.log('✅ Email sent successfully:', data);
-    return data;
+    console.log('✅ Email sent successfully:', info.messageId);
+    return info;
   } catch (error) {
     console.error('❌ Failed to send email:', error.message);
     throw error;
@@ -94,9 +96,9 @@ async function sendSecurityAlertEmail(toEmail, userName, alertType, details = {}
   const alert = alerts[alertType] || alerts.new_login;
 
   try {
-    const { data, error } = await resend.emails.send({
+    const info = await transporter.sendMail({
       from: FROM_EMAIL,
-      to: [toEmail],
+      to: toEmail,
       subject: alert.subject,
       html: `
         <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px;background:#0f1224;border-radius:16px;color:#e2e8f0;">
@@ -122,9 +124,7 @@ async function sendSecurityAlertEmail(toEmail, userName, alertType, details = {}
         </div>
       `,
     });
-
-    if (error) throw new Error(error.message);
-    return data;
+    return info;
   } catch (error) {
     console.error('Failed to send security alert email:', error.message);
     throw error;
@@ -143,9 +143,9 @@ async function sendWeakPasswordAlertEmail(toEmail, userName, weakPasswords = [])
       </div>`
     ).join('');
 
-    const { data, error } = await resend.emails.send({
+    const info = await transporter.sendMail({
       from: FROM_EMAIL,
-      to: [toEmail],
+      to: toEmail,
       subject: 'Weak Passwords Detected - Lockify Security Alert',
       html: `
         <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px;background:#0f1224;border-radius:16px;color:#e2e8f0;">
@@ -166,9 +166,7 @@ async function sendWeakPasswordAlertEmail(toEmail, userName, weakPasswords = [])
         </div>
       `,
     });
-
-    if (error) throw new Error(error.message);
-    return data;
+    return info;
   } catch (error) {
     console.error('Failed to send weak password alert email:', error.message);
     throw error;
@@ -187,9 +185,9 @@ async function sendPasswordExpiryEmail(toEmail, userName, expiredPasswords = [])
       </div>`
     ).join('');
 
-    const { data, error } = await resend.emails.send({
+    const info = await transporter.sendMail({
       from: FROM_EMAIL,
-      to: [toEmail],
+      to: toEmail,
       subject: 'Password Update Reminder - Lockify',
       html: `
         <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px;background:#0f1224;border-radius:16px;color:#e2e8f0;">
@@ -210,9 +208,7 @@ async function sendPasswordExpiryEmail(toEmail, userName, expiredPasswords = [])
         </div>
       `,
     });
-
-    if (error) throw new Error(error.message);
-    return data;
+    return info;
   } catch (error) {
     console.error('Failed to send password expiry email:', error.message);
     throw error;
@@ -224,9 +220,9 @@ async function sendPasswordExpiryEmail(toEmail, userName, expiredPasswords = [])
  */
 async function sendAccountDeletedEmail(toEmail, userName) {
   try {
-    const { data, error } = await resend.emails.send({
+    const info = await transporter.sendMail({
       from: FROM_EMAIL,
-      to: [toEmail],
+      to: toEmail,
       subject: 'Account Deleted - Lockify',
       html: `
         <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px;background:#0f1224;border-radius:16px;color:#e2e8f0;">
@@ -245,10 +241,8 @@ async function sendAccountDeletedEmail(toEmail, userName) {
         </div>
       `,
     });
-
-    if (error) throw new Error(error.message);
-    console.log(`✅ Deletion email sent to ${toEmail}`);
-    return data;
+    console.log(`✅ Deletion email sent to ${toEmail}: ${info.messageId}`);
+    return info;
   } catch (error) {
     console.error('❌ Failed to send account deletion email:', error.message);
     throw error;
