@@ -54,40 +54,73 @@ function emailWrapper(content) {
       <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#000000;padding:40px 20px;">
         <tr>
           <td align="center">
-            <table width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background-color:#0a0a0a;border-radius:16px;border:1px solid #222222;overflow:hidden;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;">
 
               <!-- Header -->
               <tr>
-                <td style="padding:24px 32px;border-bottom:1px solid #222222;">
-                  <table cellpadding="0" cellspacing="0">
+                <td style="padding:0 0 24px 0;">
+                  <table width="100%" cellpadding="0" cellspacing="0">
                     <tr>
-                      <td style="background-color:#111111;border-radius:8px;width:36px;height:36px;text-align:center;vertical-align:middle;border:1px solid #333333;">
-                        <span style="font-size:18px;line-height:36px;">🔒</span>
+                      <td>
+                        <span style="font-size:22px;font-weight:700;color:#ffffff;letter-spacing:-0.5px;">Lockify</span>
                       </td>
-                      <td style="padding-left:10px;">
-                        <span style="font-size:18px;font-weight:700;color:#ffffff;letter-spacing:-0.3px;">Lockify</span>
+                      <td align="right">
+                        <span style="font-size:11px;color:#444444;letter-spacing:1px;text-transform:uppercase;">Password Manager</span>
                       </td>
                     </tr>
                   </table>
                 </td>
               </tr>
 
-              <!-- Content -->
+              <!-- Divider -->
               <tr>
-                <td style="padding:32px;">
-                  ${content}
+                <td style="padding:0 0 24px 0;">
+                  <table width="100%" cellpadding="0" cellspacing="0">
+                    <tr>
+                      <td style="background-color:#ffffff;height:1px;font-size:0;line-height:0;">&nbsp;</td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+
+              <!-- Main Card -->
+              <tr>
+                <td style="background-color:#0a0a0a;border-radius:16px;border:1px solid #1a1a1a;overflow:hidden;">
+
+                  <!-- Card Content -->
+                  <table width="100%" cellpadding="0" cellspacing="0">
+                    <tr>
+                      <td style="padding:36px 36px 28px;">
+                        ${content}
+                      </td>
+                    </tr>
+                  </table>
+
                 </td>
               </tr>
 
               <!-- Footer -->
               <tr>
-                <td style="padding:20px 32px;border-top:1px solid #222222;background-color:#050505;">
-                  <p style="margin:0;font-size:12px;color:#555555;text-align:center;">
-                    © 2024 Lockify · Your passwords, your control
-                  </p>
-                  <p style="margin:6px 0 0;font-size:11px;color:#444444;text-align:center;">
-                    If you didn't request this email, you can safely ignore it.
-                  </p>
+                <td style="padding:24px 0 0;">
+                  <table width="100%" cellpadding="0" cellspacing="0">
+                    <tr>
+                      <td style="padding:0 0 12px 0;">
+                        <table width="100%" cellpadding="0" cellspacing="0">
+                          <tr>
+                            <td style="background-color:#222222;height:1px;font-size:0;line-height:0;">&nbsp;</td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <p style="margin:0;font-size:11px;color:#333333;text-align:center;line-height:1.8;">
+                          © 2024 Lockify · Your passwords, your control<br/>
+                          <span style="color:#222222;">If you didn't request this email, you can safely ignore it.</span>
+                        </p>
+                      </td>
+                    </tr>
+                  </table>
                 </td>
               </tr>
 
@@ -116,49 +149,57 @@ async function sendOtpEmail(toEmail, otp, type = 'verify') {
 
   const badges = {
     verify: 'Email Verification',
-    login: 'Two-Factor Auth',
+    login: 'Two-Factor Authentication',
     reset: 'Password Reset',
   };
 
   const content = `
-    <p style="margin:0 0 6px;font-size:11px;font-weight:600;color:#555555;letter-spacing:1.5px;text-transform:uppercase;">
-      ${badges[type] || badges.verify}
-    </p>
-    <h1 style="margin:0 0 12px;font-size:24px;font-weight:700;color:#ffffff;letter-spacing:-0.5px;">
-      Your verification code
+    <!-- Badge -->
+    <table cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
+      <tr>
+        <td style="background-color:#ffffff;border-radius:4px;padding:4px 10px;">
+          <span style="font-size:10px;font-weight:700;color:#000000;letter-spacing:1.5px;text-transform:uppercase;">
+            ${badges[type] || badges.verify}
+          </span>
+        </td>
+      </tr>
+    </table>
+
+    <!-- Title -->
+    <h1 style="margin:0 0 10px;font-size:28px;font-weight:700;color:#ffffff;letter-spacing:-0.5px;line-height:1.2;">
+      Your verification<br/>code
     </h1>
-    <p style="margin:0 0 28px;font-size:14px;color:#777777;line-height:1.6;">
-      Use this code to ${labels[type] || labels.verify}:
+    <p style="margin:0 0 32px;font-size:14px;color:#555555;line-height:1.6;">
+      Use this code to ${labels[type] || labels.verify}.
     </p>
 
     <!-- OTP Box -->
     <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
       <tr>
-        <td style="background-color:#111111;border:1px solid #2a2a2a;border-radius:12px;padding:32px;text-align:center;">
-          <span style="font-size:44px;font-weight:700;letter-spacing:20px;color:#ffffff;font-family:'Courier New',monospace;">
+        <td style="background-color:#ffffff;border-radius:12px;padding:32px;text-align:center;">
+          <span style="font-size:48px;font-weight:700;letter-spacing:18px;color:#000000;font-family:'Courier New',monospace;">
             ${otp}
           </span>
         </td>
       </tr>
     </table>
 
-    <!-- Timer -->
-    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
+    <!-- Info rows -->
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:12px;">
       <tr>
-        <td style="background-color:#111111;border:1px solid #1e1e1e;border-radius:8px;padding:14px 16px;">
-          <p style="margin:0;font-size:13px;color:#666666;">
-            ⏱ Expires in <strong style="color:#ffffff;">10 minutes</strong> · Never share this code with anyone
+        <td style="background-color:#111111;border-radius:8px;padding:14px 16px;">
+          <p style="margin:0;font-size:13px;color:#888888;">
+            Expires in <strong style="color:#ffffff;">10 minutes</strong>
           </p>
         </td>
       </tr>
     </table>
 
-    <!-- Security tip -->
     <table width="100%" cellpadding="0" cellspacing="0">
       <tr>
-        <td style="background-color:#0d0d0d;border:1px solid #1a1a1a;border-radius:8px;padding:14px 16px;">
+        <td style="background-color:#111111;border-radius:8px;padding:14px 16px;">
           <p style="margin:0;font-size:13px;color:#555555;">
-            🛡 Lockify will <strong style="color:#777777;">never</strong> ask for your master password via email.
+            Never share this code with anyone. Lockify will <strong style="color:#666666;">never</strong> ask for your master password.
           </p>
         </td>
       </tr>
@@ -175,42 +216,55 @@ async function sendOtpEmail(toEmail, otp, type = 'verify') {
 /* ── Security Alert Email ── */
 async function sendSecurityAlertEmail(toEmail, userName, alertType, details = {}) {
   const alerts = {
-    new_login: { subject: 'New Login to Your Lockify Account', icon: '🔐', title: 'New Login Detected', message: 'We detected a new login to your Lockify account.' },
-    failed_attempt: { subject: 'Failed Login Attempt - Lockify', icon: '⚠️', title: 'Failed Login Attempt', message: 'There was a failed attempt to login to your account.' },
-    password_changed: { subject: 'Password Changed - Lockify', icon: '🔑', title: 'Password Successfully Changed', message: 'Your Lockify master password was recently changed.' },
-    account_deleted: { subject: 'Account Deleted - Lockify', icon: '🗑️', title: 'Account Deleted', message: 'Your Lockify account has been permanently deleted.' },
+    new_login: { subject: 'New Login to Your Lockify Account', title: 'New Login Detected', message: 'We detected a new login to your Lockify account.' },
+    failed_attempt: { subject: 'Failed Login Attempt - Lockify', title: 'Failed Login Attempt', message: 'There was a failed attempt to login to your account.' },
+    password_changed: { subject: 'Password Changed - Lockify', title: 'Password Successfully Changed', message: 'Your Lockify master password was recently changed.' },
+    account_deleted: { subject: 'Account Deleted - Lockify', title: 'Account Deleted', message: 'Your Lockify account has been permanently deleted.' },
   };
 
   const alert = alerts[alertType] || alerts.new_login;
 
   const content = `
-    <p style="margin:0 0 6px;font-size:11px;font-weight:600;color:#555555;letter-spacing:1.5px;text-transform:uppercase;">
-      Security Alert
-    </p>
-    <h1 style="margin:0 0 12px;font-size:24px;font-weight:700;color:#ffffff;letter-spacing:-0.5px;">
-      ${alert.icon} ${alert.title}
+    <!-- Badge -->
+    <table cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
+      <tr>
+        <td style="background-color:#ffffff;border-radius:4px;padding:4px 10px;">
+          <span style="font-size:10px;font-weight:700;color:#000000;letter-spacing:1.5px;text-transform:uppercase;">
+            Security Alert
+          </span>
+        </td>
+      </tr>
+    </table>
+
+    <!-- Title -->
+    <h1 style="margin:0 0 10px;font-size:28px;font-weight:700;color:#ffffff;letter-spacing:-0.5px;line-height:1.2;">
+      ${alert.title}
     </h1>
-    <p style="margin:0 0 28px;font-size:14px;color:#777777;line-height:1.6;">
+    <p style="margin:0 0 32px;font-size:14px;color:#555555;line-height:1.6;">
       ${alert.message}
     </p>
 
-    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
+    <!-- Details box -->
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:12px;">
       <tr>
-        <td style="background-color:#111111;border:1px solid #2a2a2a;border-radius:12px;padding:20px;">
-          <p style="margin:0 0 10px;font-size:11px;font-weight:600;color:#555555;letter-spacing:1px;text-transform:uppercase;">Details</p>
+        <td style="background-color:#111111;border-radius:8px;padding:20px;">
+          <p style="margin:0 0 6px;font-size:10px;font-weight:700;color:#444444;letter-spacing:1.5px;text-transform:uppercase;">Details</p>
           <p style="margin:0;font-size:14px;color:#888888;line-height:1.8;">
-            Time: <strong style="color:#ffffff;">${new Date().toLocaleString()}</strong><br/>
-            Device: <strong style="color:#ffffff;">${details.device || 'Unknown'}</strong>
+            Time &nbsp;&nbsp;&nbsp;
+            <strong style="color:#ffffff;">${new Date().toLocaleString()}</strong><br/>
+            Device &nbsp;
+            <strong style="color:#ffffff;">${details.device || 'Unknown'}</strong>
           </p>
         </td>
       </tr>
     </table>
 
+    <!-- Warning -->
     <table width="100%" cellpadding="0" cellspacing="0">
       <tr>
-        <td style="background-color:#150a0a;border:1px solid #2d1515;border-radius:8px;padding:14px 16px;">
-          <p style="margin:0;font-size:13px;color:#666666;">
-            ⚠️ If this wasn't you, please <strong style="color:#ef4444;">secure your account immediately</strong>.
+        <td style="border:1px solid #333333;border-radius:8px;padding:14px 16px;">
+          <p style="margin:0;font-size:13px;color:#555555;">
+            If this wasn't you, please secure your account immediately by changing your master password.
           </p>
         </td>
       </tr>
@@ -227,30 +281,41 @@ async function sendSecurityAlertEmail(toEmail, userName, alertType, details = {}
 /* ── Account Deleted Email ── */
 async function sendAccountDeletedEmail(toEmail, userName) {
   const content = `
-    <p style="margin:0 0 6px;font-size:11px;font-weight:600;color:#555555;letter-spacing:1.5px;text-transform:uppercase;">
-      Account Notice
-    </p>
-    <h1 style="margin:0 0 12px;font-size:24px;font-weight:700;color:#ffffff;letter-spacing:-0.5px;">
+    <!-- Badge -->
+    <table cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
+      <tr>
+        <td style="background-color:#ffffff;border-radius:4px;padding:4px 10px;">
+          <span style="font-size:10px;font-weight:700;color:#000000;letter-spacing:1.5px;text-transform:uppercase;">
+            Account Notice
+          </span>
+        </td>
+      </tr>
+    </table>
+
+    <!-- Title -->
+    <h1 style="margin:0 0 10px;font-size:28px;font-weight:700;color:#ffffff;letter-spacing:-0.5px;line-height:1.2;">
       Account Deleted
     </h1>
-    <p style="margin:0 0 28px;font-size:14px;color:#777777;line-height:1.6;">
+    <p style="margin:0 0 32px;font-size:14px;color:#555555;line-height:1.6;">
       Hi <strong style="color:#ffffff;">${userName}</strong>, your Lockify account has been permanently deleted as requested.
     </p>
 
-    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
+    <!-- Confirmation box -->
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:12px;">
       <tr>
-        <td style="background-color:#111111;border:1px solid #2a2a2a;border-radius:12px;padding:24px;text-align:center;">
-          <p style="margin:0;font-size:15px;font-weight:700;color:#ef4444;">Account Permanently Closed</p>
+        <td style="background-color:#ffffff;border-radius:8px;padding:24px;text-align:center;">
+          <p style="margin:0;font-size:15px;font-weight:700;color:#000000;">Account Permanently Closed</p>
           <p style="margin:8px 0 0;font-size:13px;color:#555555;">All your data has been wiped from our systems.</p>
         </td>
       </tr>
     </table>
 
+    <!-- Warning -->
     <table width="100%" cellpadding="0" cellspacing="0">
       <tr>
-        <td style="background-color:#150a0a;border:1px solid #2d1515;border-radius:8px;padding:14px 16px;">
-          <p style="margin:0;font-size:13px;color:#666666;">
-            ⚠️ If you did not request this, please contact support <strong style="color:#ef4444;">immediately</strong>.
+        <td style="border:1px solid #333333;border-radius:8px;padding:14px 16px;">
+          <p style="margin:0;font-size:13px;color:#555555;">
+            If you did not request this deletion, please contact support immediately.
           </p>
         </td>
       </tr>
