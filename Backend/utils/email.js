@@ -58,25 +58,14 @@ function emailWrapper(content) {
 
               <!-- Header -->
               <tr>
-                <td style="padding:28px 32px;border-bottom:1px solid #222222;">
+                <td style="padding:24px 32px;border-bottom:1px solid #222222;">
                   <table cellpadding="0" cellspacing="0">
                     <tr>
-                      <td>
-                        <table cellpadding="0" cellspacing="0">
-                          <tr>
-                            <td style="background-color:#000000;border-radius:8px;padding:8px;border:1px solid #333333;">
-                              <svg width="20" height="20" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <rect width="32" height="32" rx="8" fill="#000000"/>
-                                <rect x="7" y="14" width="18" height="12" rx="2" fill="white"/>
-                                <path d="M10 14V10a6 6 0 0 1 12 0v4" stroke="white" stroke-width="2.5" fill="none"/>
-                                <circle cx="16" cy="20" r="1.5" fill="#000000"/>
-                              </svg>
-                            </td>
-                            <td style="padding-left:10px;">
-                              <span style="font-size:18px;font-weight:700;color:#ffffff;letter-spacing:-0.3px;">Lockify</span>
-                            </td>
-                          </tr>
-                        </table>
+                      <td style="background-color:#111111;border-radius:8px;width:36px;height:36px;text-align:center;vertical-align:middle;border:1px solid #333333;">
+                        <span style="font-size:18px;line-height:36px;">🔒</span>
+                      </td>
+                      <td style="padding-left:10px;">
+                        <span style="font-size:18px;font-weight:700;color:#ffffff;letter-spacing:-0.3px;">Lockify</span>
                       </td>
                     </tr>
                   </table>
@@ -125,46 +114,41 @@ async function sendOtpEmail(toEmail, otp, type = 'verify') {
     reset: 'reset your password',
   };
 
-  const icons = {
-    verify: '✉️',
-    login: '🔐',
-    reset: '🔑',
+  const badges = {
+    verify: 'Email Verification',
+    login: 'Two-Factor Auth',
+    reset: 'Password Reset',
   };
 
   const content = `
-    <p style="margin:0 0 6px;font-size:13px;font-weight:600;color:#888888;letter-spacing:1px;text-transform:uppercase;">
-      ${icons[type]} ${type === 'verify' ? 'Email Verification' : type === 'login' ? 'Two-Factor Auth' : 'Password Reset'}
+    <p style="margin:0 0 6px;font-size:11px;font-weight:600;color:#555555;letter-spacing:1.5px;text-transform:uppercase;">
+      ${badges[type] || badges.verify}
     </p>
-    <h1 style="margin:0 0 12px;font-size:26px;font-weight:700;color:#ffffff;letter-spacing:-0.5px;">
+    <h1 style="margin:0 0 12px;font-size:24px;font-weight:700;color:#ffffff;letter-spacing:-0.5px;">
       Your verification code
     </h1>
-    <p style="margin:0 0 28px;font-size:15px;color:#888888;line-height:1.6;">
+    <p style="margin:0 0 28px;font-size:14px;color:#777777;line-height:1.6;">
       Use this code to ${labels[type] || labels.verify}:
     </p>
 
     <!-- OTP Box -->
-    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
       <tr>
-        <td style="background-color:#111111;border:1px solid #333333;border-radius:12px;padding:28px;text-align:center;">
-          <span style="font-size:42px;font-weight:700;letter-spacing:16px;color:#ffffff;font-family:'Courier New',monospace;">
+        <td style="background-color:#111111;border:1px solid #2a2a2a;border-radius:12px;padding:32px;text-align:center;">
+          <span style="font-size:44px;font-weight:700;letter-spacing:20px;color:#ffffff;font-family:'Courier New',monospace;">
             ${otp}
           </span>
         </td>
       </tr>
     </table>
 
-    <!-- Timer notice -->
-    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
+    <!-- Timer -->
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
       <tr>
-        <td style="background-color:#111111;border:1px solid #222222;border-radius:8px;padding:14px 16px;">
-          <table cellpadding="0" cellspacing="0">
-            <tr>
-              <td style="font-size:18px;padding-right:10px;">⏱️</td>
-              <td style="font-size:13px;color:#888888;">
-                This code expires in <strong style="color:#ffffff;">10 minutes</strong>. Never share it with anyone.
-              </td>
-            </tr>
-          </table>
+        <td style="background-color:#111111;border:1px solid #1e1e1e;border-radius:8px;padding:14px 16px;">
+          <p style="margin:0;font-size:13px;color:#666666;">
+            ⏱ Expires in <strong style="color:#ffffff;">10 minutes</strong> · Never share this code with anyone
+          </p>
         </td>
       </tr>
     </table>
@@ -173,14 +157,9 @@ async function sendOtpEmail(toEmail, otp, type = 'verify') {
     <table width="100%" cellpadding="0" cellspacing="0">
       <tr>
         <td style="background-color:#0d0d0d;border:1px solid #1a1a1a;border-radius:8px;padding:14px 16px;">
-          <table cellpadding="0" cellspacing="0">
-            <tr>
-              <td style="font-size:18px;padding-right:10px;">🛡️</td>
-              <td style="font-size:13px;color:#666666;">
-                Lockify will <strong style="color:#888888;">never</strong> ask for your master password via email.
-              </td>
-            </tr>
-          </table>
+          <p style="margin:0;font-size:13px;color:#555555;">
+            🛡 Lockify will <strong style="color:#777777;">never</strong> ask for your master password via email.
+          </p>
         </td>
       </tr>
     </table>
@@ -205,21 +184,21 @@ async function sendSecurityAlertEmail(toEmail, userName, alertType, details = {}
   const alert = alerts[alertType] || alerts.new_login;
 
   const content = `
-    <p style="margin:0 0 6px;font-size:13px;font-weight:600;color:#888888;letter-spacing:1px;text-transform:uppercase;">
+    <p style="margin:0 0 6px;font-size:11px;font-weight:600;color:#555555;letter-spacing:1.5px;text-transform:uppercase;">
       Security Alert
     </p>
-    <h1 style="margin:0 0 12px;font-size:26px;font-weight:700;color:#ffffff;letter-spacing:-0.5px;">
+    <h1 style="margin:0 0 12px;font-size:24px;font-weight:700;color:#ffffff;letter-spacing:-0.5px;">
       ${alert.icon} ${alert.title}
     </h1>
-    <p style="margin:0 0 28px;font-size:15px;color:#888888;line-height:1.6;">
+    <p style="margin:0 0 28px;font-size:14px;color:#777777;line-height:1.6;">
       ${alert.message}
     </p>
 
-    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
       <tr>
-        <td style="background-color:#111111;border:1px solid #333333;border-radius:12px;padding:20px;">
-          <p style="margin:0 0 10px;font-size:12px;font-weight:600;color:#666666;letter-spacing:1px;text-transform:uppercase;">Details</p>
-          <p style="margin:0;font-size:14px;color:#aaaaaa;line-height:1.8;">
+        <td style="background-color:#111111;border:1px solid #2a2a2a;border-radius:12px;padding:20px;">
+          <p style="margin:0 0 10px;font-size:11px;font-weight:600;color:#555555;letter-spacing:1px;text-transform:uppercase;">Details</p>
+          <p style="margin:0;font-size:14px;color:#888888;line-height:1.8;">
             Time: <strong style="color:#ffffff;">${new Date().toLocaleString()}</strong><br/>
             Device: <strong style="color:#ffffff;">${details.device || 'Unknown'}</strong>
           </p>
@@ -229,15 +208,10 @@ async function sendSecurityAlertEmail(toEmail, userName, alertType, details = {}
 
     <table width="100%" cellpadding="0" cellspacing="0">
       <tr>
-        <td style="background-color:#1a0a0a;border:1px solid #3d1515;border-radius:8px;padding:14px 16px;">
-          <table cellpadding="0" cellspacing="0">
-            <tr>
-              <td style="font-size:18px;padding-right:10px;">⚠️</td>
-              <td style="font-size:13px;color:#888888;">
-                If this wasn't you, please <strong style="color:#ef4444;">secure your account immediately</strong>.
-              </td>
-            </tr>
-          </table>
+        <td style="background-color:#150a0a;border:1px solid #2d1515;border-radius:8px;padding:14px 16px;">
+          <p style="margin:0;font-size:13px;color:#666666;">
+            ⚠️ If this wasn't you, please <strong style="color:#ef4444;">secure your account immediately</strong>.
+          </p>
         </td>
       </tr>
     </table>
@@ -250,136 +224,34 @@ async function sendSecurityAlertEmail(toEmail, userName, alertType, details = {}
   });
 }
 
-/* ── Weak Password Alert ── */
-async function sendWeakPasswordAlertEmail(toEmail, userName, weakPasswords = []) {
-  const passwordList = weakPasswords.map(pwd => `
-    <tr>
-      <td style="padding:10px 0;border-bottom:1px solid #1a1a1a;">
-        <span style="font-size:14px;color:#ffffff;font-weight:600;">${pwd.name || 'Unknown'}</span>
-        <span style="font-size:12px;color:#ef4444;margin-left:10px;">● Weak</span>
-      </td>
-    </tr>
-  `).join('');
-
-  const content = `
-    <p style="margin:0 0 6px;font-size:13px;font-weight:600;color:#888888;letter-spacing:1px;text-transform:uppercase;">
-      Security Warning
-    </p>
-    <h1 style="margin:0 0 12px;font-size:26px;font-weight:700;color:#ffffff;letter-spacing:-0.5px;">
-      🔓 Weak Passwords Detected
-    </h1>
-    <p style="margin:0 0 28px;font-size:15px;color:#888888;line-height:1.6;">
-      We found <strong style="color:#ffffff;">${weakPasswords.length} password(s)</strong> that need your attention.
-    </p>
-
-    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
-      <tr>
-        <td style="background-color:#111111;border:1px solid #333333;border-radius:12px;padding:20px;">
-          <p style="margin:0 0 12px;font-size:12px;font-weight:600;color:#666666;letter-spacing:1px;text-transform:uppercase;">Weak Passwords</p>
-          <table width="100%" cellpadding="0" cellspacing="0">
-            ${passwordList}
-          </table>
-        </td>
-      </tr>
-    </table>
-
-    <table width="100%" cellpadding="0" cellspacing="0">
-      <tr>
-        <td style="background-color:#1a1200;border:1px solid #3d2e00;border-radius:8px;padding:14px 16px;">
-          <table cellpadding="0" cellspacing="0">
-            <tr>
-              <td style="font-size:18px;padding-right:10px;">💡</td>
-              <td style="font-size:13px;color:#888888;">
-                Update these passwords to <strong style="color:#ffffff;">stronger ones</strong> to protect your accounts.
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>
-  `;
-
-  await sendBrevoEmail({
-    to: toEmail,
-    subject: 'Weak Passwords Detected - Lockify Security Alert',
-    html: emailWrapper(content),
-  });
-}
-
-/* ── Password Expiry Reminder ── */
-async function sendPasswordExpiryEmail(toEmail, userName, expiredPasswords = []) {
-  const passwordList = expiredPasswords.map(pwd => `
-    <tr>
-      <td style="padding:10px 0;border-bottom:1px solid #1a1a1a;">
-        <span style="font-size:14px;color:#ffffff;font-weight:600;">${pwd.name || 'Unknown'}</span>
-        <span style="font-size:12px;color:#f59e0b;margin-left:10px;">● ${pwd.age || '90+ days old'}</span>
-      </td>
-    </tr>
-  `).join('');
-
-  const content = `
-    <p style="margin:0 0 6px;font-size:13px;font-weight:600;color:#888888;letter-spacing:1px;text-transform:uppercase;">
-      Reminder
-    </p>
-    <h1 style="margin:0 0 12px;font-size:26px;font-weight:700;color:#ffffff;letter-spacing:-0.5px;">
-      ⏰ Password Update Reminder
-    </h1>
-    <p style="margin:0 0 28px;font-size:15px;color:#888888;line-height:1.6;">
-      You have <strong style="color:#ffffff;">${expiredPasswords.length} password(s)</strong> older than 90 days.
-    </p>
-
-    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
-      <tr>
-        <td style="background-color:#111111;border:1px solid #333333;border-radius:12px;padding:20px;">
-          <p style="margin:0 0 12px;font-size:12px;font-weight:600;color:#666666;letter-spacing:1px;text-transform:uppercase;">Passwords to Update</p>
-          <table width="100%" cellpadding="0" cellspacing="0">
-            ${passwordList}
-          </table>
-        </td>
-      </tr>
-    </table>
-  `;
-
-  await sendBrevoEmail({
-    to: toEmail,
-    subject: 'Password Update Reminder - Lockify',
-    html: emailWrapper(content),
-  });
-}
-
 /* ── Account Deleted Email ── */
 async function sendAccountDeletedEmail(toEmail, userName) {
   const content = `
-    <p style="margin:0 0 6px;font-size:13px;font-weight:600;color:#888888;letter-spacing:1px;text-transform:uppercase;">
+    <p style="margin:0 0 6px;font-size:11px;font-weight:600;color:#555555;letter-spacing:1.5px;text-transform:uppercase;">
       Account Notice
     </p>
-    <h1 style="margin:0 0 12px;font-size:26px;font-weight:700;color:#ffffff;letter-spacing:-0.5px;">
+    <h1 style="margin:0 0 12px;font-size:24px;font-weight:700;color:#ffffff;letter-spacing:-0.5px;">
       Account Deleted
     </h1>
-    <p style="margin:0 0 28px;font-size:15px;color:#888888;line-height:1.6;">
+    <p style="margin:0 0 28px;font-size:14px;color:#777777;line-height:1.6;">
       Hi <strong style="color:#ffffff;">${userName}</strong>, your Lockify account has been permanently deleted as requested.
     </p>
 
-    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
       <tr>
-        <td style="background-color:#111111;border:1px solid #333333;border-radius:12px;padding:24px;text-align:center;">
-          <p style="margin:0;font-size:16px;font-weight:700;color:#ef4444;">Account Permanently Closed</p>
-          <p style="margin:8px 0 0;font-size:13px;color:#666666;">All your data has been wiped from our systems.</p>
+        <td style="background-color:#111111;border:1px solid #2a2a2a;border-radius:12px;padding:24px;text-align:center;">
+          <p style="margin:0;font-size:15px;font-weight:700;color:#ef4444;">Account Permanently Closed</p>
+          <p style="margin:8px 0 0;font-size:13px;color:#555555;">All your data has been wiped from our systems.</p>
         </td>
       </tr>
     </table>
 
     <table width="100%" cellpadding="0" cellspacing="0">
       <tr>
-        <td style="background-color:#1a0a0a;border:1px solid #3d1515;border-radius:8px;padding:14px 16px;">
-          <table cellpadding="0" cellspacing="0">
-            <tr>
-              <td style="font-size:18px;padding-right:10px;">⚠️</td>
-              <td style="font-size:13px;color:#888888;">
-                If you did not request this, please contact support <strong style="color:#ef4444;">immediately</strong>.
-              </td>
-            </tr>
-          </table>
+        <td style="background-color:#150a0a;border:1px solid #2d1515;border-radius:8px;padding:14px 16px;">
+          <p style="margin:0;font-size:13px;color:#666666;">
+            ⚠️ If you did not request this, please contact support <strong style="color:#ef4444;">immediately</strong>.
+          </p>
         </td>
       </tr>
     </table>
@@ -396,7 +268,5 @@ async function sendAccountDeletedEmail(toEmail, userName) {
 module.exports = {
   sendOtpEmail,
   sendSecurityAlertEmail,
-  sendWeakPasswordAlertEmail,
-  sendPasswordExpiryEmail,
   sendAccountDeletedEmail,
 };
